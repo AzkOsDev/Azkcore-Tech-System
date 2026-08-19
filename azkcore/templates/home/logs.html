@@ -1,0 +1,154 @@
+{% extends "components/home/base.html" %}
+{% load static %}
+{% block title %}Azkcore - Logs{% endblock %}
+{% block content %}
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    {% include "components/home/header.html" with subtitle="Logs" description="Registro de actividad y eventos del sistema" %}
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+
+      <!-- Page heading -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-xl font-display font-semibold tracking-tight">Logs</h2>
+            <span class="flex items-center gap-1.5 rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#22C55E] uppercase tracking-wider">
+              <span class="h-1.5 w-1.5 rounded-full bg-[#22C55E] animate-pulse"></span>
+              En vivo
+            </span>
+          </div>
+          <p class="text-sm text-mist mt-1">Actividad de escaneos, autenticación y errores del sistema</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button class="flex items-center gap-2 bg-surface2 border border-hairline hover:border-white/10 rounded-lg px-3.5 py-2 text-sm font-medium text-paper hover:bg-white/[0.04] transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m0 12-4-4m4 4 4-4"/><path d="M2 17l.6 2.4A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.9-1.6l.6-2.4"/></svg>
+            Exportar
+          </button>
+          <button class="flex items-center gap-2 bg-surface2 border border-hairline hover:border-white/10 rounded-lg px-3.5 py-2 text-sm font-medium text-paper hover:bg-white/[0.04] transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+            Actualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ BUSCADOR + FILTROS ============ -->
+      <div class="bg-surface2 border border-hairline rounded-2xl p-4 mb-5">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <form method="GET" class="flex-1 flex items-center gap-2 bg-surface border border-hairline rounded-lg px-3.5 py-2.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-mist shrink-0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Buscar por mensaje, IP, usuario o target..."
+              class="flex-1 bg-transparent text-sm text-paper placeholder:text-mist/50 focus:outline-none">
+          </form>
+
+          <div class="flex items-center gap-2 font-mono text-[12px] uppercase tracking-wider">
+            <a href="?nivel=todos" class="px-3.5 py-2 rounded-lg border {% if nivel_filtro == 'todos' or not nivel_filtro %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200 whitespace-nowrap">
+              Todos
+            </a>
+            <a href="?nivel=info" class="px-3.5 py-2 rounded-lg border {% if nivel_filtro == 'info' %}border-[#3D8EFF]/40 text-[#3D8EFF] bg-[#3D8EFF]/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200 whitespace-nowrap">
+              Info
+            </a>
+            <a href="?nivel=warning" class="px-3.5 py-2 rounded-lg border {% if nivel_filtro == 'warning' %}border-[#F59E0B]/40 text-[#F59E0B] bg-[#F59E0B]/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200 whitespace-nowrap">
+              Warning
+            </a>
+            <a href="?nivel=error" class="px-3.5 py-2 rounded-lg border {% if nivel_filtro == 'error' %}border-[#EF4444]/40 text-[#EF4444] bg-[#EF4444]/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200 whitespace-nowrap">
+              Error
+            </a>
+            <a href="?nivel=critical" class="px-3.5 py-2 rounded-lg border {% if nivel_filtro == 'critical' %}border-[#EF4444]/60 text-[#EF4444] bg-[#EF4444]/20{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200 whitespace-nowrap">
+              Crítico
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ CONSOLA DE LOGS ============ -->
+      <div class="bg-surface2 border border-hairline rounded-2xl overflow-hidden">
+
+        <!-- Console header -->
+        <div class="flex items-center justify-between px-4 py-2.5 border-b border-hairline bg-surface/60">
+          <div class="flex items-center gap-1.5">
+            <span class="h-2.5 w-2.5 rounded-full bg-[#EF4444]/40"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-[#F59E0B]/40"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-[#22C55E]/40"></span>
+          </div>
+          <span class="text-[11px] text-mist/70 font-mono">{{ logs|length|default:"0" }} eventos mostrados</span>
+        </div>
+
+        <!-- Log lines -->
+        <div class="flex flex-col divide-y divide-hairline font-mono text-[13px]">
+
+          {% for log in logs %}
+          <details class="group">
+            <summary class="list-none flex items-start gap-3 px-4 py-2.5 cursor-pointer hover:bg-white/[0.02] transition-colors duration-150 marker:hidden">
+
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-mist/50 mt-1 shrink-0 transition-transform duration-200 group-open:rotate-90"><path d="m9 18 6-6-6-6"/></svg>
+
+              <span class="text-mist/70 shrink-0 whitespace-nowrap">{{ log.creado|date:"H:i:s" }}</span>
+
+              {% if log.nivel == 'critical' %}
+              <span class="shrink-0 rounded border border-[#EF4444]/30 bg-[#EF4444]/15 px-1.5 py-0.5 text-[10px] font-semibold text-[#EF4444] uppercase whitespace-nowrap">Critical</span>
+              {% elif log.nivel == 'error' %}
+              <span class="shrink-0 rounded border border-[#EF4444]/20 bg-[#EF4444]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#EF4444] uppercase whitespace-nowrap">Error</span>
+              {% elif log.nivel == 'warning' %}
+              <span class="shrink-0 rounded border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#F59E0B] uppercase whitespace-nowrap">Warning</span>
+              {% else %}
+              <span class="shrink-0 rounded border border-[#3D8EFF]/20 bg-[#3D8EFF]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#3D8EFF] uppercase whitespace-nowrap">Info</span>
+              {% endif %}
+
+              <span class="text-paper/90 truncate flex-1">{{ log.mensaje }}</span>
+
+              {% if log.usuario %}
+              <span class="text-mist/50 shrink-0 whitespace-nowrap hidden sm:inline">{{ log.usuario.username }}</span>
+              {% endif %}
+            </summary>
+
+            <div class="px-4 pb-3 pl-[3.6rem] flex flex-col gap-1.5 text-[12px] text-mist">
+              {% if log.ip %}
+              <p><span class="text-mist/50">ip:</span> {{ log.ip }}</p>
+              {% endif %}
+              {% if log.origen %}
+              <p><span class="text-mist/50">origen:</span> {{ log.origen }}</p>
+              {% endif %}
+              {% if log.detalle %}
+              <p class="whitespace-pre-wrap break-all"><span class="text-mist/50">detalle:</span> {{ log.detalle }}</p>
+              {% endif %}
+              <p><span class="text-mist/50">fecha:</span> {{ log.creado|date:"d M Y, H:i:s" }}</p>
+            </div>
+          </details>
+
+          {% empty %}
+          <!-- Empty state -->
+          <div class="flex flex-col items-center justify-center text-center p-12">
+            <div class="w-12 h-12 rounded-lg bg-white/[0.04] flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B96A8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-paper font-sans">Sin logs por ahora</h3>
+            <p class="text-xs text-mist mt-1.5 max-w-xs font-sans">Los eventos del sistema aparecerán aquí a medida que ocurran.</p>
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+
+      {% if is_paginated %}
+      <div class="flex items-center justify-between mt-6 text-xs text-mist font-mono">
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        <div class="flex items-center gap-2">
+          {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Anterior</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Siguiente</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Footer spacing -->
+      <div class="h-6"></div>
+    </main>
+  </div>
+{% endblock %}

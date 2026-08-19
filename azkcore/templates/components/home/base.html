@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="{% static 'img/logo_blue.ico' %}">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink:      '#080B10',
+          surface:  '#0D131C',
+          surface2: '#121A26',
+          deepblue: '#0F2847',
+          accent:   '#3D8EFF',
+          accentdim:'#1F4E8C',
+          paper:    '#F3F6FA',
+          mist:     '#8B96A8',
+          hairline: '#1B2431',
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['"Inter"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+      }
+    }
+  }
+</script>
+<style>
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.15); }
+  body { -webkit-font-smoothing: antialiased; }
+</style>
+</head>
+  <body class="bg-ink text-paper font-body antialiased">
+    <div class="flex h-screen w-full overflow-hidden">
+      {% include "components/home/sidebar.html" %}
+      {% block content %}
+      {% endblock %}
+  </div>
+{% block extra_js %}
+{% endblock %}
+</body>
+</html>

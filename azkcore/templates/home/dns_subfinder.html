@@ -1,0 +1,241 @@
+{% extends "components/home/base.html" %}
+{% load static %}
+{% block title %}Azkcore - DNS Subfinder{% endblock %}
+{% block content %}
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    {% include "components/home/header.html" with subtitle="DNS Subfinder" description="Enumeración de subdominios sobre un dominio objetivo" %}
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+
+      <!-- Page heading -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-xl font-display font-semibold tracking-tight">DNS Subfinder</h2>
+          <p class="text-sm text-mist mt-1">Descubre subdominios activos de un dominio</p>
+        </div>
+
+        <button class="flex items-center gap-2 bg-surface2 border border-hairline hover:border-white/10 rounded-lg px-3.5 py-2 text-sm font-medium text-paper hover:bg-white/[0.04] transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+          Actualizar
+        </button>
+      </div>
+
+      <!-- ============ STAT CARDS ============ -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-6">
+
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3D8EFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14 14 0 0 0 0 20 14 14 0 0 0 0-20Z"/><path d="M2 12h20"/></svg>
+            </div>
+            <span class="text-xs text-mist">Total escaneos</span>
+          </div>
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ total_count|default:"0" }}</p>
+        </div>
+
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-[#F59E0B]/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <span class="text-xs text-mist">En progreso</span>
+          </div>
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ running_count|default:"0" }}</p>
+        </div>
+
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-[#22C55E]/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <span class="text-xs text-mist">Completados</span>
+          </div>
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ done_count|default:"0" }}</p>
+        </div>
+
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-[#EF4444]/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            </div>
+            <span class="text-xs text-mist">Errores</span>
+          </div>
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ error_count|default:"0" }}</p>
+        </div>
+      </div>
+
+      <!-- ============ NUEVO ESCANEO ============ -->
+      <div class="bg-surface2 border border-hairline rounded-2xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-paper mb-4">Nuevo escaneo</h3>
+        <form method="POST" class="flex flex-col gap-3">
+          {% csrf_token %}
+
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
+            <div class="flex-1">
+              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Dominio</label>
+              <input type="text" name="target" placeholder="ejemplo.com" required
+                class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper placeholder:text-mist/50 focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+            </div>
+
+            <div class="sm:w-52">
+              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Fuentes</label>
+              <select name="fuentes" class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+                <option value="all">Todas las fuentes</option>
+                <option value="passive">Solo pasivas</option>
+                <option value="active">Activas (bruteforce DNS)</option>
+              </select>
+            </div>
+
+            <button type="submit" class="flex items-center justify-center gap-2 bg-accent hover:bg-accentdim rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors duration-200 whitespace-nowrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              Escanear
+            </button>
+          </div>
+
+          <!-- ===== Opciones adicionales ===== -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div class="flex-1">
+              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Resolver / verificar (-nV / -resolvers)</label>
+              <select name="resolve" class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+                <option value="resolve">Resolver IPs (mostrar solo activos)</option>
+                <option value="no_resolve">No resolver (más rápido)</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Wordlist para subdominios (opcional)</label>
+              <select name="wordlist" class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+                <option value="">Ninguna (solo fuentes pasivas)</option>
+                <option value="common">subdomains-top1million-5000.txt</option>
+                <option value="medium">subdomains-top1million-20000.txt</option>
+                <option value="big">subdomains-top1million-110000.txt</option>
+              </select>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ============ FILTER TABS ============ -->
+      <div class="flex flex-wrap items-center gap-2 mb-5 font-mono text-[12px] uppercase tracking-wider">
+        <a href="?estado=todos" class="px-3.5 py-1.5 rounded-full border {% if estado_filtro == 'todos' or not estado_filtro %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200">
+          Todos
+        </a>
+        <a href="?estado=running" class="px-3.5 py-1.5 rounded-full border {% if estado_filtro == 'running' %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200">
+          En progreso
+        </a>
+        <a href="?estado=done" class="px-3.5 py-1.5 rounded-full border {% if estado_filtro == 'done' %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200">
+          Completados
+        </a>
+        <a href="?estado=error" class="px-3.5 py-1.5 rounded-full border {% if estado_filtro == 'error' %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200">
+          Errores
+        </a>
+      </div>
+
+      <!-- ============ SCAN LIST ============ -->
+      <div class="flex flex-col gap-3">
+
+        {% for scan in scans %}
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-start gap-4">
+
+            <!-- Icon -->
+            <div class="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-deepblue to-accent flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14 14 0 0 0 0 20 14 14 0 0 0 0-20Z"/><path d="M2 12h20"/></svg>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-sm font-semibold text-paper truncate">{{ scan.target }}</h3>
+                    {% if scan.estado == 'running' or scan.estado == 'pending' %}
+                    <span class="h-1.5 w-1.5 rounded-full bg-accent shrink-0"></span>
+                    {% endif %}
+                  </div>
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-mist font-mono">
+                    <span class="flex items-center gap-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                      subfinder
+                    </span>
+                    {% if scan.total_subdominios %}
+                    <span class="flex items-center gap-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="20" height="8" rx="2"/><rect x="2" y="2" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg>
+                      {{ scan.total_subdominios }} encontrados
+                    </span>
+                    {% endif %}
+                    {% if scan.creado_por %}
+                    <span class="flex items-center gap-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      {{ scan.creado_por.username }}
+                    </span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  {% if scan.estado == 'done' %}
+                  <span class="rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#22C55E] whitespace-nowrap">Completado</span>
+                  {% elif scan.estado == 'running' or scan.estado == 'pending' %}
+                  <span class="rounded-full border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#F59E0B] whitespace-nowrap">En progreso</span>
+                  {% else %}
+                  <span class="rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#EF4444] whitespace-nowrap">Error</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              {% if scan.estado == 'done' and scan.resultado %}
+              <p class="text-sm text-mist mt-3 leading-relaxed line-clamp-2 font-mono">{{ scan.resultado|truncatechars:160 }}</p>
+              {% elif scan.estado == 'error' and scan.error_msg %}
+              <p class="text-sm text-[#EF4444] mt-3 leading-relaxed line-clamp-2 font-mono">{{ scan.error_msg }}</p>
+              {% endif %}
+
+              <div class="flex items-center justify-between mt-4 pt-3 border-t border-hairline">
+                <span class="text-[11px] text-mist/70 font-mono">{{ scan.creado|date:"d M Y, H:i" }}</span>
+
+                <div class="flex items-center gap-2">
+                  {% if scan.estado == 'done' %}
+                  <button class="text-xs font-medium text-mist hover:text-paper transition-colors duration-200">
+                    Ver subdominios
+                  </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% empty %}
+        <!-- Empty state -->
+        <div class="bg-surface2 border border-hairline rounded-2xl p-12 flex flex-col items-center justify-center text-center">
+          <div class="w-12 h-12 rounded-lg bg-white/[0.04] flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B96A8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14 14 0 0 0 0 20 14 14 0 0 0 0-20Z"/><path d="M2 12h20"/></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-paper">Sin escaneos por ahora</h3>
+          <p class="text-xs text-mist mt-1.5 max-w-xs">Lanza tu primer escaneo con el formulario de arriba para ver los subdominios encontrados aquí.</p>
+        </div>
+        {% endfor %}
+
+      </div>
+
+      {% if is_paginated %}
+      <div class="flex items-center justify-between mt-6 text-xs text-mist font-mono">
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        <div class="flex items-center gap-2">
+          {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Anterior</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Siguiente</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Footer spacing -->
+      <div class="h-6"></div>
+    </main>
+  </div>
+{% endblock %}

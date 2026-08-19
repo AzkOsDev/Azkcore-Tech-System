@@ -1,0 +1,89 @@
+{% extends "components/home/base.html" %}
+{% load static %}
+{% block title %}Azkcore - Perfil{% endblock %}
+{% block content %}
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    {% include "components/home/header.html" with subtitle="Perfil" description="Información de tu cuenta y actividad" %}
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-3xl">
+
+      <!-- ============ CABECERA DE PERFIL ============ -->
+      <div class="bg-surface2 border border-hairline rounded-2xl p-6 mb-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+
+          <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-br from-deepblue to-accent flex items-center justify-center text-xl font-display font-semibold text-white">
+            {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="w-16 h-16 rounded-full object-cover">
+            {% else %}
+            {{ user.username|slice:":2"|upper }}
+            {% endif %}
+          </div>
+
+          <div class="flex-1 min-w-0">
+            <h2 class="text-lg font-display font-semibold tracking-tight text-paper">{{ user.get_full_name|default:user.username }}</h2>
+            <p class="text-sm text-mist mt-0.5">{{ user.email }}</p>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="rounded-full border border-accent/20 bg-accent/10 px-2.5 py-1 text-[10px] font-mono font-medium text-accent uppercase tracking-wider">
+                {{ user.role|default:"Usuario" }}
+              </span>
+              <span class="text-[11px] text-mist/70 font-mono">Miembro desde {{ user.date_joined|date:"d M Y" }}</span>
+            </div>
+          </div>
+
+            <a href="{% url 'settings' %}"
+                class="flex items-center gap-2 bg-surface border border-hairline hover:border-white/10 rounded-lg px-3.5 py-2 text-sm font-medium text-paper hover:bg-white/[0.04] transition-colors duration-200 shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                Editar perfil
+            </a>
+        </div>
+      </div>
+
+      <!-- ============ STATS ============ -->
+      <div class="grid grid-cols-3 gap-4 sm:gap-5 mb-6">
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 text-center">
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ total_escaneos|default:"0" }}</p>
+          <p class="text-xs text-mist mt-1">Escaneos totales</p>
+        </div>
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 text-center">
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ hallazgos_criticos|default:"0" }}</p>
+          <p class="text-xs text-mist mt-1">Hallazgos críticos</p>
+        </div>
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 text-center">
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ ultimo_acceso|date:"d M"|default:"—" }}</p>
+          <p class="text-xs text-mist mt-1">Último acceso</p>
+        </div>
+      </div>
+
+      <!-- ============ ACTIVIDAD RECIENTE ============ -->
+      <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+        <h3 class="text-sm font-semibold text-paper mb-4">Actividad reciente</h3>
+
+        <div class="flex flex-col gap-3">
+          {% for scan in scans_recientes %}
+          <div class="flex items-center justify-between py-2 {% if not forloop.last %}border-b border-hairline{% endif %}">
+            <div class="min-w-0">
+              <p class="text-sm text-paper truncate">{{ scan.target }}</p>
+              <p class="text-xs text-mist mt-0.5 font-mono">{{ scan.creado|date:"d M Y, H:i" }}</p>
+            </div>
+            {% if scan.estado == 'done' %}
+            <span class="rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#22C55E] whitespace-nowrap">Completado</span>
+            {% elif scan.estado == 'running' or scan.estado == 'pending' %}
+            <span class="rounded-full border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#F59E0B] whitespace-nowrap">En progreso</span>
+            {% else %}
+            <span class="rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#EF4444] whitespace-nowrap">Error</span>
+            {% endif %}
+          </div>
+          {% empty %}
+          <p class="text-sm text-mist py-2">Todavía no tienes actividad registrada.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Footer spacing -->
+      <div class="h-6"></div>
+    </main>
+  </div>
+{% endblock %}

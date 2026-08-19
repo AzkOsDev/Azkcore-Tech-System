@@ -1,0 +1,148 @@
+{% load static %}
+{% load nav_extras %}
+<!-- ============ SIDEBAR ============ -->
+  <aside class="hidden md:flex md:flex-col w-[240px] lg:w-[264px] shrink-0 bg-surface border-r border-hairline">
+
+    <!-- Logo -->
+    <div class="h-16 flex items-center gap-2.5 px-6 border-b border-hairline">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-deepblue flex items-center justify-center shrink-0">
+            <span class="vp-mark" aria-hidden="true">
+                <img src="{% static 'img/logo_black.png' %}" alt="Azkcore Tech" class="w-6 h-6 transition-transform duration-300 group-hover:scale-110">
+            </span>
+      </div>
+      <span class="text-[15px] font-display font-semibold tracking-tight">AzkCore System</span>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 overflow-y-auto px-3 py-5 space-y-6">
+
+      <div class="space-y-0.5">
+        <p class="px-3 pb-2 text-[11px] font-semibold tracking-wider text-mist/70 uppercase font-mono">General</p>
+
+
+        <!-- Active item -->
+        {% nav_active 'dashboard' as is_active %}
+        <a href="{% url 'dashboard' %}"
+          class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg {% if is_active %}bg-white/[0.06] text-paper{% else %}text-mist hover:text-paper hover:bg-white/[0.04]{% endif %} group transition-colors duration-200">
+          {% if is_active %}
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-accent"></span>
+          {% endif %}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          <span class="text-sm font-medium">Dashboard</span>
+        </a>
+
+
+
+        {% nav_active 'scan_network' as is_active %}
+        <a href="{% url 'scan_network' %}"
+          class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg {% if is_active %}bg-white/[0.06] text-paper{% else %}text-mist hover:text-paper hover:bg-white/[0.04]{% endif %} transition-colors duration-200">
+          {% if is_active %}
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-accent"></span>
+          {% endif %}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="2" y="14" width="20" height="8" rx="2"/><rect x="2" y="2" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg>
+          <span class="text-sm font-medium">Scan Network</span>
+        </a>
+
+        {% nav_active 'messages' as is_active %}
+        <a href="{% url 'messages' %}"
+          class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg {% if is_active %}bg-white/[0.06] text-paper{% else %}text-mist hover:text-paper hover:bg-white/[0.04]{% endif %} transition-colors duration-200">
+          {% if is_active %}
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-accent"></span>
+          {% endif %}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="text-sm font-medium">Messages</span>
+          <span class="ml-auto h-1.5 w-1.5 rounded-full bg-[#EF4444]"></span>
+        </a>
+
+        {% nav_active 'scan_web' as is_active %}
+        <a href="{% url 'scan_web' %}"
+          class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg {% if is_active %}bg-white/[0.06] text-paper{% else %}text-mist hover:text-paper hover:bg-white/[0.04]{% endif %} transition-colors duration-200">
+          {% if is_active %}
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-accent"></span>
+          {% endif %}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>
+          <span class="text-sm font-medium">Web Scanner</span>
+        </a>
+
+        {% nav_active 'dns_subfinder' as is_active %}
+        <a href="{% url 'dns_subfinder' %}"
+          class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg {% if is_active %}bg-white/[0.06] text-paper{% else %}text-mist hover:text-paper hover:bg-white/[0.04]{% endif %} transition-colors duration-200">
+          {% if is_active %}
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-accent"></span>
+          {% endif %}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v5M12 12 5 17M12 12l7 5"/></svg>
+          <span class="text-sm font-medium">DNS Subfinder</span>
+        </a>
+
+        {% nav_active 'logs' as is_active %}
+        <a href="{% url 'logs' %}"
+          class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg {% if is_active %}bg-white/[0.06] text-paper{% else %}text-mist hover:text-paper hover:bg-white/[0.04]{% endif %} transition-colors duration-200">
+          {% if is_active %}
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-accent"></span>
+          {% endif %}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg>
+          <span class="text-sm font-medium">Logs</span>
+        </a>
+        
+      </div>
+
+      <div class="space-y-0.5">
+        <p class="px-3 pb-2 text-[11px] font-semibold tracking-wider text-mist/70 uppercase font-mono">Herramientas | DEVELOPING</p>
+
+        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-mist hover:text-paper hover:bg-white/[0.04] transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="text-sm font-medium">Password Analyzer</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-mist hover:text-paper hover:bg-white/[0.04] transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg>
+          <span class="text-sm font-medium">File Scanner</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-mist hover:text-paper hover:bg-white/[0.04] transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6M9 9h1"/></svg>
+          <span class="text-sm font-medium">Reports</span>
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-mist hover:text-paper hover:bg-white/[0.04] transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="text-sm font-medium">History</span>
+        </a>
+      </div>
+
+      <div class="space-y-0.5">
+        <p class="px-3 pb-2 text-[11px] font-semibold tracking-wider text-mist/70 uppercase font-mono">Cuenta</p>
+
+        {% nav_active 'settings' as is_active %}
+        <a href="{% url 'settings' %}"
+          class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg {% if is_active %}bg-white/[0.06] text-paper{% else %}text-mist hover:text-paper hover:bg-white/[0.04]{% endif %} transition-colors duration-200">
+          {% if is_active %}
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-accent"></span>
+          {% endif %}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+          <span class="text-sm font-medium">Settings</span>
+        </a>
+
+        {% nav_active 'profile' as is_active %}
+        <a href="{% url 'profile' %}"
+          class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg {% if is_active %}bg-white/[0.06] text-paper{% else %}text-mist hover:text-paper hover:bg-white/[0.04]{% endif %} transition-colors duration-200">
+          {% if is_active %}
+          <span class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-accent"></span>
+          {% endif %}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="text-sm font-medium">Profile</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Sidebar footer / status -->
+    <div class="p-4 border-t border-hairline">
+      <div class="flex items-center gap-2.5 rounded-lg bg-white/[0.03] px-3 py-2.5">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-60"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]"></span>
+        </span>
+        <span class="text-xs text-mist">Sistema protegido</span>
+      </div>
+    </div>
+  </aside>

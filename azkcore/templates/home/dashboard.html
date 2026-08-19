@@ -1,0 +1,172 @@
+{% extends "components/home/base.html" %}
+{% load static%}
+{% block title %}Azkcore - Dashboard{% endblock %}
+{% block content%}
+<div class="flex h-screen w-full overflow-hidden">
+
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+  {% include "components/home/header.html" with subtitle="Dashboard" description="Monitoreo en tiempo real de la infraestructura protegida" %}
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+
+      <!-- Page heading -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-xl font-display font-semibold tracking-tight">System Overview</h2>
+          <p class="text-sm text-mist mt-1">Monitoreo en tiempo real de la infraestructura protegida</p>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <select class="bg-surface2 border border-hairline rounded-lg px-3 py-2 text-sm text-paper focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+            <option>Últimas 24 horas</option>
+            <option>Últimos 7 días</option>
+            <option>Últimos 30 días</option>
+          </select>
+
+          <button class="flex items-center gap-2 bg-surface2 border border-hairline hover:border-white/10 rounded-lg px-3.5 py-2 text-sm font-medium text-paper hover:bg-white/[0.04] transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+            Actualizar
+          </button>
+
+          <button class="flex items-center gap-2 bg-accent hover:bg-accentdim rounded-lg px-3.5 py-2 text-sm font-medium text-white transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuevo escaneo
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ BENTO GRID ============ -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 auto-rows-[130px]">
+
+        <!-- Security Status - large -->
+        <div class="sm:col-span-2 lg:col-span-2 row-span-2 bg-surface2 border border-hairline rounded-2xl p-5 flex flex-col hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg bg-[#22C55E]/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+              </div>
+              <h3 class="text-sm font-semibold text-paper">Security Status</h3>
+            </div>
+            <span class="inline-flex items-center gap-1.5 rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-[11px] font-medium text-[#22C55E]">
+              <span class="h-1.5 w-1.5 rounded-full bg-[#22C55E]"></span> Protegido
+            </span>
+          </div>
+          <div class="flex-1 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-white/[0.06]"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+          </div>
+        </div>
+
+        <!-- System Overview -->
+        <div class="lg:col-span-2 bg-surface2 border border-hairline rounded-2xl p-5 flex flex-col hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3D8EFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-paper">System Overview</h3>
+          </div>
+        </div>
+
+        <!-- Threat Monitor -->
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 flex flex-col hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-lg bg-[#EF4444]/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-paper">Threat Monitor</h3>
+          </div>
+        </div>
+
+        <!-- Network Activity -->
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 flex flex-col hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-lg bg-[#06B6D4]/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h4l2-7 4 14 2-7h4"/></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-paper">Network Activity</h3>
+          </div>
+        </div>
+
+        <!-- Recent Scans - tall -->
+        <div class="lg:row-span-2 bg-surface2 border border-hairline rounded-2xl p-5 flex flex-col hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg bg-deepblue/40 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </div>
+              <h3 class="text-sm font-semibold text-paper">Recent Scans</h3>
+            </div>
+            <span class="text-mist hover:text-paper transition-colors duration-200 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </span>
+          </div>
+          <div class="flex-1 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-white/[0.06]"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+        </div>
+
+        <!-- Firewall -->
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 flex flex-col hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg bg-[#22C55E]/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>
+              </div>
+              <h3 class="text-sm font-semibold text-paper">Firewall</h3>
+            </div>
+            <span class="rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2 py-0.5 text-[10px] font-medium text-[#22C55E]">Activo</span>
+          </div>
+        </div>
+
+        <!-- DNS -->
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 flex flex-col hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3D8EFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>
+              </div>
+              <h3 class="text-sm font-semibold text-paper">DNS</h3>
+            </div>
+            <span class="rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-[10px] font-medium text-accent">Estable</span>
+          </div>
+        </div>
+
+        <!-- HTTPS -->
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 flex flex-col hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg bg-[#06B6D4]/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </div>
+              <h3 class="text-sm font-semibold text-paper">HTTPS</h3>
+            </div>
+            <span class="rounded-full border border-[#06B6D4]/20 bg-[#06B6D4]/10 px-2 py-0.5 text-[10px] font-medium text-[#06B6D4]">Cifrado</span>
+          </div>
+        </div>
+
+        <!-- Logs - wide -->
+        <div class="sm:col-span-2 bg-surface2 border border-hairline rounded-2xl p-5 flex flex-col hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8B96A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>
+              </div>
+              <h3 class="text-sm font-semibold text-paper">Logs</h3>
+            </div>
+            <a href="{% url 'logs' %}" class="flex items-center gap-1.5 text-xs text-mist hover:text-paper transition-colors duration-200">
+              Ver todo
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer spacing -->
+      <div class="h-6"></div>
+    </main>
+  </div>
+</div>
+{% endblock %}

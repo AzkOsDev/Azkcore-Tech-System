@@ -1,0 +1,74 @@
+{% extends "components/home/base.html" %}
+{% load static %}
+{% block title %}Azkcore - Configuración{% endblock %}
+{% block content %}
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    {% include "components/home/header.html" with subtitle="Configuración" description="Preferencias generales de la cuenta y del sistema" %}
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-3xl">
+
+      <!-- Page heading -->
+      <div class="mb-6">
+        <h2 class="text-xl font-display font-semibold tracking-tight">Configuración</h2>
+        <p class="text-sm text-mist mt-1">Ajusta tus preferencias de cuenta y notificaciones</p>
+      </div>
+
+      <form method="POST" class="flex flex-col gap-5">
+        {% csrf_token %}
+
+        <!-- ============ CUENTA ============ -->
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <h3 class="text-sm font-semibold text-paper mb-4">Cuenta</h3>
+
+          <div class="flex flex-col sm:flex-row gap-3 mb-3">
+            <div class="flex-1">
+              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Usuario</label>
+              <input type="text" name="username" value="{{ user.username }}"
+                class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+            </div>
+            <div class="flex-1">
+              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Correo</label>
+              <input type="email" name="email" value="{{ user.email }}"
+                class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ SEGURIDAD ============ -->
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <h3 class="text-sm font-semibold text-paper mb-4">Seguridad</h3>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div class="flex-1">
+              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Contraseña actual</label>
+              <input type="password" name="current_password" placeholder="••••••••"
+                class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper placeholder:text-mist/50 focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+            </div>
+            <div class="flex-1">
+              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Nueva contraseña</label>
+              <input type="password" name="new_password" placeholder="••••••••"
+                class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper placeholder:text-mist/50 focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ ACCIONES ============ -->
+        <div class="flex items-center justify-end gap-3">
+          <button type="button" class="px-4 py-2.5 rounded-lg border border-hairline text-sm font-medium text-mist hover:text-paper hover:border-white/10 transition-colors duration-200">
+            Cancelar
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-lg bg-accent hover:bg-accentdim text-sm font-medium text-white transition-colors duration-200">
+            Guardar cambios
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Footer spacing -->
+      <div class="h-6"></div>
+    </main>
+  </div>
+{% endblock %}

@@ -1,0 +1,296 @@
+{% extends "components/home/base.html" %}
+{% load static %}
+{% block title %}Azkcore - Messages{% endblock %}
+{% block content %}
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    {% include "components/home/header.html" with subtitle="Messages" description="Solicitudes recibidas a través del formulario de auditoría" %}
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+
+      <!-- Page heading -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-xl font-display font-semibold tracking-tight">Mensajes de contacto</h2>
+          <p class="text-sm text-mist mt-1">Solicitudes recibidas a través del formulario de auditoría</p>
+        </div>
+
+        <button class="flex items-center gap-2 bg-surface2 border border-hairline hover:border-white/10 rounded-lg px-3.5 py-2 text-sm font-medium text-paper hover:bg-white/[0.04] transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+          Actualizar
+        </button>
+      </div>
+
+      <!-- ============ STAT CARDS ============ -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-6">
+
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3D8EFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <span class="text-xs text-mist">Total</span>
+          </div>
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ total_count|default:"0" }}</p>
+        </div>
+
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-[#EF4444]/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            </div>
+            <span class="text-xs text-mist">Pendientes</span>
+          </div>
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ pendientes_count|default:"0" }}</p>
+        </div>
+
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-[#22C55E]/10 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <span class="text-xs text-mist">Atendidos</span>
+          </div>
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ atendidos_count|default:"0" }}</p>
+        </div>
+
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+          <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-9 h-9 rounded-lg bg-deepblue/40 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <span class="text-xs text-mist">Esta semana</span>
+          </div>
+          <p class="text-2xl font-display font-semibold tracking-tight">{{ semana_count|default:"0" }}</p>
+        </div>
+      </div>
+
+      <!-- ============ FILTER TABS ============ -->
+      <div class="flex items-center gap-2 mb-5 font-mono text-[12px] uppercase tracking-wider">
+        <a href="?estado=todos" class="px-3.5 py-1.5 rounded-full border {% if estado_filtro == 'todos' or not estado_filtro %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200">
+          Todos
+        </a>
+        <a href="?estado=pendientes" class="px-3.5 py-1.5 rounded-full border {% if estado_filtro == 'pendientes' %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200">
+          Pendientes
+        </a>
+        <a href="?estado=atendidos" class="px-3.5 py-1.5 rounded-full border {% if estado_filtro == 'atendidos' %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200">
+          Atendidos
+        </a>
+      </div>
+
+      <!-- ============ MESSAGE LIST ============ -->
+      <div class="flex flex-col gap-3">
+
+        {% for msg in messages %}
+        <div class="bg-surface2 border border-hairline rounded-2xl p-5 hover:border-white/10 transition-colors duration-300">
+          <div class="flex items-start gap-4">
+
+            <!-- Avatar initial -->
+            <div class="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-deepblue to-accent flex items-center justify-center text-xs font-semibold uppercase">
+              {{ msg.nombre|slice:":2" }}
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="text-sm font-semibold text-paper truncate">{{ msg.nombre }}</h3>
+                    {% if msg.empresa %}
+                    <span class="text-xs text-mist truncate">— {{ msg.empresa }}</span>
+                    {% endif %}
+                    {% if not msg.atendido %}
+                    <span class="h-1.5 w-1.5 rounded-full bg-accent shrink-0"></span>
+                    {% endif %}
+                  </div>
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-mist font-mono">
+                    <span class="flex items-center gap-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+                      {{ msg.correo }}
+                    </span>
+                    {% if msg.telefono %}
+                    <span class="flex items-center gap-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                      {{ msg.telefono }}
+                    </span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  {% if msg.servicio %}
+                  <span class="rounded-full border border-accent/20 bg-accent/10 px-2.5 py-1 text-[10px] font-mono font-medium text-accent whitespace-nowrap">{{ msg.servicio }}</span>
+                  {% endif %}
+                  {% if msg.atendido %}
+                  <span class="rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#22C55E] whitespace-nowrap">Atendido</span>
+                  {% else %}
+                  <span class="rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#EF4444] whitespace-nowrap">Pendiente</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <p class="text-sm text-mist mt-3 leading-relaxed line-clamp-2">{{ msg.mensaje }}</p>
+
+              <div class="flex items-center justify-between mt-4 pt-3 border-t border-hairline">
+                <span class="text-[11px] text-mist/70 font-mono">{{ msg.creado|date:"d M Y, H:i" }}</span>
+
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onclick="abrirDetalle(this)"
+                    data-nombre="{{ msg.nombre }}"
+                    data-empresa="{{ msg.empresa }}"
+                    data-correo="{{ msg.correo }}"
+                    data-telefono="{{ msg.telefono }}"
+                    data-servicio="{{ msg.servicio }}"
+                    data-mensaje="{{ msg.mensaje }}"
+                    data-fecha="{{ msg.creado|date:'d M Y, H:i' }}"
+                    data-atendido="{{ msg.atendido|yesno:'true,false' }}"
+                    class="text-xs font-medium text-mist hover:text-paper transition-colors duration-200">
+                    Ver detalle
+                  </button>
+                  {% if not msg.atendido %}
+                  <form method="POST" action="{% url 'contact_message_mark_atendido' msg.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="flex items-center gap-1.5 bg-accent hover:bg-accentdim rounded-lg px-3 py-1.5 text-xs font-medium text-white transition-colors duration-200">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                      Marcar atendido
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% empty %}
+        <!-- Empty state -->
+        <div class="bg-surface2 border border-hairline rounded-2xl p-12 flex flex-col items-center justify-center text-center">
+          <div class="w-12 h-12 rounded-lg bg-white/[0.04] flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B96A8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-paper">Sin mensajes por ahora</h3>
+          <p class="text-xs text-mist mt-1.5 max-w-xs">Cuando alguien complete el formulario de auditoría en tu landing page, aparecerá aquí.</p>
+        </div>
+        {% endfor %}
+
+      </div>
+
+      {% if is_paginated %}
+      <div class="flex items-center justify-between mt-6 text-xs text-mist font-mono">
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        <div class="flex items-center gap-2">
+          {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Anterior</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Siguiente</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Footer spacing -->
+      <div class="h-6"></div>
+    </main>
+  </div>
+
+  <!-- ============ MODAL DETALLE MENSAJE ============ -->
+  <div id="modal-detalle" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/60" onclick="cerrarDetalle()"></div>
+
+    <!-- Modal box -->
+    <div class="relative bg-surface2 border border-hairline rounded-2xl p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto overflow-x-hidden">
+      <div class="flex items-start justify-between gap-4 mb-5">
+        <div class="flex items-center gap-3 min-w-0">
+          <div id="modal-avatar" class="w-11 h-11 shrink-0 rounded-full bg-gradient-to-br from-deepblue to-accent flex items-center justify-center text-sm font-semibold uppercase"></div>
+          <div class="min-w-0 break-words">
+            <h3 id="modal-nombre" class="text-base font-semibold text-paper break-words"></h3>
+            <p id="modal-empresa" class="text-xs text-mist break-words"></p>
+          </div>
+        </div>
+        <button onclick="cerrarDetalle()" class="shrink-0 text-mist hover:text-paper transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 mb-5">
+        <span id="modal-estado" class="rounded-full px-2.5 py-1 text-[10px] font-mono font-medium whitespace-nowrap"></span>
+        <span id="modal-servicio-badge" class="rounded-full border border-accent/20 bg-accent/10 px-2.5 py-1 text-[10px] font-mono font-medium text-accent whitespace-nowrap"></span>
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <div class="flex items-center gap-2.5 text-mist font-mono text-xs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+          <span id="modal-correo" class="break-all"></span>
+        </div>
+        <div id="modal-telefono-row" class="flex items-center gap-2.5 text-mist font-mono text-xs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span id="modal-telefono"></span>
+        </div>
+
+        <div class="pt-2 border-t border-hairline">
+          <p class="text-xs text-mist/70 font-mono uppercase tracking-wider mb-2">Mensaje</p>
+          <p id="modal-mensaje" class="text-paper leading-relaxed whitespace-pre-wrap break-words"></p>
+        </div>
+
+        <div class="pt-3 border-t border-hairline">
+          <span id="modal-fecha" class="text-[11px] text-mist/70 font-mono"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function abrirDetalle(btn) {
+      const d = btn.dataset;
+
+      document.getElementById('modal-avatar').textContent = d.nombre.slice(0, 2).toUpperCase();
+      document.getElementById('modal-nombre').textContent = d.nombre;
+      document.getElementById('modal-empresa').textContent = d.empresa || '';
+      document.getElementById('modal-correo').textContent = d.correo;
+      document.getElementById('modal-mensaje').textContent = d.mensaje;
+      document.getElementById('modal-fecha').textContent = d.fecha;
+
+      const telRow = document.getElementById('modal-telefono-row');
+      if (d.telefono) {
+        document.getElementById('modal-telefono').textContent = d.telefono;
+        telRow.classList.remove('hidden');
+      } else {
+        telRow.classList.add('hidden');
+      }
+
+      const servicioBadge = document.getElementById('modal-servicio-badge');
+      if (d.servicio) {
+        servicioBadge.textContent = d.servicio;
+        servicioBadge.classList.remove('hidden');
+      } else {
+        servicioBadge.classList.add('hidden');
+      }
+
+      const estadoBadge = document.getElementById('modal-estado');
+      if (d.atendido === 'true') {
+        estadoBadge.textContent = 'Atendido';
+        estadoBadge.className = 'rounded-full px-2.5 py-1 text-[10px] font-mono font-medium whitespace-nowrap border border-[#22C55E]/20 bg-[#22C55E]/10 text-[#22C55E]';
+      } else {
+        estadoBadge.textContent = 'Pendiente';
+        estadoBadge.className = 'rounded-full px-2.5 py-1 text-[10px] font-mono font-medium whitespace-nowrap border border-[#EF4444]/20 bg-[#EF4444]/10 text-[#EF4444]';
+      }
+
+      document.getElementById('modal-detalle').classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function cerrarDetalle() {
+      document.getElementById('modal-detalle').classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') cerrarDetalle();
+    });
+  </script>
+{% endblock %}
