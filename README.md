@@ -2,12 +2,12 @@
 
 <img src="azkcore/static/img/logo_black.png" alt="AzkCore Tech Logo" width="120">
 
-# AzkCore Tech Landing
+# AzkCore Tech System
 
 </div>
 
 <p align="center">
-Landing page oficial de <strong>AzkCore Tech</strong> desarrollada con <strong>Django</strong>.
+System page oficial de <strong>AzkCore Tech</strong> desarrollada con <strong>Django</strong>.
 </p>
 
 <p align="center">
