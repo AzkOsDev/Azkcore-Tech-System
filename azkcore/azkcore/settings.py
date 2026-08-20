@@ -1,5 +1,8 @@
 from pathlib import Path
+from decouple import config
 
+API_BEARER_TOKEN = config("API_BEARER_TOKEN", default=None)
+API_BASE_URL = config("API_BASE_URL", default="http://127.0.0.1:8000")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,7 +12,7 @@ SECRET_KEY = 'django-insecure-g@j1-$b6!ng)-#*1kuu@x4(l4va^r8e1_kx*+rqd7f*7h*x#x4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'azkcore.tech']
 
 
 # Application definition

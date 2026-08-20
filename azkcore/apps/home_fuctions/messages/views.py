@@ -1,53 +1,75 @@
-from django.shortcuts import render
+from datetime import datetime, timedelta
+import requests
+from django.conf import settings
+from django.contrib import messages as django_messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+from django.utils import timezone
 
+
+@login_required
 def messages_view(request):
-    return render(request, 'home/messages.html', {})
+    estado_filtro = request.GET.get('estado', 'todos')
 
-#@login_required
-#def messages_view(request):
-    # ---- Filtro por estado (?estado=todos|pendientes|atendidos) ----
-    #estado_filtro = request.GET.get('estado', 'todos')
+    try:
+        response = requests.get(
+            f"{settings.API_BASE_URL}/api/messages/all/",
+            headers={"X-Authorization": f"Bearer {settings.API_BEARER_TOKEN}"},
+            timeout=5,
+        )
+        response.raise_for_status()
+        all_messages = response.json().get("messages", [])
+    except requests.RequestException:
+        all_messages = []
+        django_messages.error(request, "No se pudo conectar con la API de la Landing Page.")
 
-   # qs = ContactMessage.objects.all()  # ya viene ordenado por -creado gracias al Meta del modelo
+    if estado_filtro == 'pendientes':
+        filtered = [m for m in all_messages if not m.get('atendido')]
+    elif estado_filtro == 'atendidos':
+        filtered = [m for m in all_messages if m.get('atendido')]
+    else:
+        filtered = all_messages
 
-   # if estado_filtro == 'pendientes':
-  #      qs = qs.filter(atendido=False)
- #   elif estado_filtro == 'atendidos':
-   #     qs = qs.filter(atendido=True)
-    # 'todos' o cualquier otro valor -> sin filtro adicional
+    total_count = len(all_messages)
+    pendientes_count = sum(1 for m in all_messages if not m.get('atendido'))
+    atendidos_count = sum(1 for m in all_messages if m.get('atendido'))
 
-    # ---- Stat cards ----
-    #total_count = ContactMessage.objects.count()
-    #pendientes_count = ContactMessage.objects.filter(atendido=False).count()
-   # atendidos_count = ContactMessage.objects.filter(atendido=True).count()
+    inicio_semana = timezone.now() - timedelta(days=7)
+    semana_count = sum(
+        1 for m in all_messages
+        if datetime.fromisoformat(m['creado']) >= inicio_semana
+    )
 
-  #  inicio_semana = timezone.now() - timedelta(days=7)
-   # semana_count = ContactMessage.objects.filter(creado__gte=inicio_semana).count()
+    context = {
+        'messages': filtered,
+        'is_paginated': False,
+        'estado_filtro': estado_filtro,
+        'total_count': total_count,
+        'pendientes_count': pendientes_count,
+        'atendidos_count': atendidos_count,
+        'semana_count': semana_count,
+    }
 
-    # ---- Paginación ----
-    #paginator = Paginator(qs, 10)  # 10 mensajes por página, ajusta a gusto
-    #page_number = request.GET.get('page')
-    #page_obj = paginator.get_page(page_number)
-
-    #context = {
-    #    'messages': page_obj,          # el template itera sobre "messages"
-    #    'page_obj': page_obj,
-   #     'is_paginated': page_obj.has_other_pages(),
-  #      'estado_filtro': estado_filtro,
-   #     'total_count': total_count,
-  #      'pendientes_count': pendientes_count,
-  #      'atendidos_count': atendidos_count,
-  #      'semana_count': semana_count,
-  #  }
-
-   # return render(request, 'home/messages.html', context)
+    return render(request, 'home/messages.html', context)
 
 
-#@login_required
-#def contact_message_mark_atendido(request, pk):
-#    if request.method == 'POST':
-      #  msg = get_object_or_404(ContactMessage, pk=pk)
- #      msg.atendido = True
-   #     msg.save(update_fields=['atendido'])
-    #    django_messages.success(request, f'Mensaje de {msg.nombre} marcado como atendido.')
- #   return redirect(request.META.get('HTTP_REFERER', 'messages'))
+@login_required
+def contact_message_mark_atendido(request, pk):
+    if request.method == 'POST':
+        try:
+            response = requests.patch(
+                f"{settings.API_BASE_URL}/api/messages/{pk}/mark-atendido/",
+                headers={"X-Authorization": f"Bearer {settings.API_BEARER_TOKEN}"},
+                timeout=5,
+            )
+            if response.status_code == 200:
+                nombre = response.json().get("message", {}).get("nombre", "")
+                django_messages.success(request, f'Mensaje de {nombre} marcado como atendido.')
+            elif response.status_code == 404:
+                django_messages.error(request, 'El mensaje no existe.')
+            else:
+                django_messages.error(request, 'No se pudo actualizar el mensaje.')
+        except requests.RequestException:
+            django_messages.error(request, 'No se pudo conectar con la API de la Landing Page.')
+
+    return redirect(request.META.get('HTTP_REFERER', 'messages'))
