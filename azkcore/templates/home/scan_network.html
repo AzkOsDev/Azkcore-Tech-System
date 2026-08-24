@@ -164,9 +164,18 @@
 
                 <div class="flex items-center gap-2">
                   {% if scan.estado == 'done' %}
-                  <button class="text-xs font-medium text-mist hover:text-paper transition-colors duration-200">
-                    Ver detalle
-                  </button>
+                    <button
+                      type="button"
+                      onclick="abrirModalScan(this)"
+                      data-target="{{ scan.target }}"
+                      data-tipo="{{ scan.get_tipo_display }}"
+                      data-estado="{{ scan.get_estado_display }}"
+                      data-creado="{{ scan.creado|date:'d M Y, H:i' }}"
+                      data-creado-por="{{ scan.creado_por.username|default:'—' }}"
+                      data-resultado="{{ scan.resultado }}"
+                      class="text-xs font-medium text-mist hover:text-paper transition-colors duration-200">
+                      Ver detalle
+                    </button>
                   {% endif %}
                 </div>
               </div>
@@ -200,9 +209,74 @@
         </div>
       </div>
       {% endif %}
-
+      <!-- ============ MODAL DETALLE ESCANEO ============ -->
+      <div id="modalScanDetalle" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="cerrarModalScan()"></div>
+        <div class="relative min-h-full flex items-center justify-center p-4">
+          <div class="bg-surface2 border border-hairline rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-hairline shrink-0">
+              <div>
+                <h3 class="text-sm font-semibold text-paper" id="modalScanTarget">—</h3>
+                <p class="text-xs text-mist mt-0.5">Detalle del escaneo</p>
+              </div>
+              <button onclick="cerrarModalScan()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/[0.06] text-mist hover:text-paper transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 px-6 py-4 border-b border-hairline shrink-0 text-xs font-mono">
+              <div><p class="text-mist mb-1">Tipo</p><p class="text-paper" id="modalScanTipo">—</p></div>
+              <div><p class="text-mist mb-1">Estado</p><p class="text-paper" id="modalScanEstado">—</p></div>
+              <div><p class="text-mist mb-1">Fecha</p><p class="text-paper" id="modalScanFecha">—</p></div>
+              <div><p class="text-mist mb-1">Creado por</p><p class="text-paper" id="modalScanCreadoPor">—</p></div>
+            </div>
+            <div class="flex-1 overflow-y-auto px-6 py-4">
+              <p class="text-xs text-mist mb-2 font-mono uppercase tracking-wider">Salida de nmap</p>
+              <pre id="modalScanResultado" class="text-xs text-paper font-mono whitespace-pre-wrap break-words bg-surface border border-hairline rounded-lg p-4 leading-relaxed"></pre>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-6 py-4 border-t border-hairline shrink-0">
+              <button onclick="copiarResultadoScan()" class="flex items-center gap-2 bg-surface border border-hairline hover:border-white/10 rounded-lg px-3.5 py-2 text-xs font-medium text-paper hover:bg-white/[0.04] transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copiar
+              </button>
+              <button onclick="cerrarModalScan()" class="bg-accent hover:bg-accentdim rounded-lg px-4 py-2 text-xs font-medium text-white transition-colors duration-200">
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Footer spacing -->
       <div class="h-6"></div>
     </main>
   </div>
+{% block scripts %}
+<script>
+  function abrirModalScan(btn) {
+    const d = btn.dataset;
+    document.getElementById('modalScanTarget').textContent = d.target;
+    document.getElementById('modalScanTipo').textContent = d.tipo;
+    document.getElementById('modalScanEstado').textContent = d.estado;
+    document.getElementById('modalScanFecha').textContent = d.creado;
+    document.getElementById('modalScanCreadoPor').textContent = d.creadoPor;
+    document.getElementById('modalScanResultado').textContent = d.resultado || 'Sin salida disponible.';
+
+    document.getElementById('modalScanDetalle').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarModalScan() {
+    document.getElementById('modalScanDetalle').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function copiarResultadoScan() {
+    const texto = document.getElementById('modalScanResultado').textContent;
+    navigator.clipboard.writeText(texto);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') cerrarModalScan();
+  });
+</script>
+{% endblock %}
 {% endblock %}

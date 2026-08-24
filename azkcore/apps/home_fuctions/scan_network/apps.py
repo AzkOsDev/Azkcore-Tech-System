@@ -2,4 +2,6 @@ from django.apps import AppConfig
 
 
 class ScanNetworkConfig(AppConfig):
-    name = 'scan_network'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.home_fuctions.scan_network"  # ← debe ser la ruta completa desde la raíz del proyecto
+    label = "scan_network"  # opcional, pero útil si hay conflicto de nombres con otra app

@@ -1,4 +1,5 @@
 from pathlib import Path
+from django.templatetags.static import static
 from decouple import config
 
 API_BEARER_TOKEN = config("API_BEARER_TOKEN", default=None)
@@ -18,6 +19,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'azkcore.tech']
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -28,8 +30,28 @@ INSTALLED_APPS = [
     'apps.home',
     'apps.home_fuctions.messages',
     'apps.home_fuctions.scan_web',
+    'apps.home_fuctions.scan_network'
 ]
+UNFOLD = {
+    "SITE_TITLE": "AzkCore Tech | Administrator",
+    "SITE_HEADER": "AzkCore Administrator",
+    "SITE_URL": "/",
+    "SITE_SYMBOL": "security",
 
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "THEME": "dark",
+
+    "SITE_LOGO": {
+        "light": lambda request: static("img/logo_blue.png"),
+        "dark": lambda request: static("img/logo_black.png"),
+    },
+
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+    },
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
