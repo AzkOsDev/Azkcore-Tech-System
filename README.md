@@ -7,7 +7,7 @@
 </div>
 
 <p align="center">
-System page oficial de <strong>AzkCore Tech</strong> desarrollada con <strong>Django</strong>.
+System page oficial de <strong>AzkCore Tech</strong> desarrollada con <strong>Django </strong>.
 </p>
 
 <p align="center">
