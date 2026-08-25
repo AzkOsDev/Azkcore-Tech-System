@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/images/icon.png" alt="AzkCore Tech Logo" width="120">
+<img src="docs/images/logo.png" alt="AzkCore Tech Logo" width="120">
 
 # AzkCore Tech System
 
