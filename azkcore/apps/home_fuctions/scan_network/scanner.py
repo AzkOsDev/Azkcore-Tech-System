@@ -3,15 +3,16 @@ import shutil
 import subprocess
 import threading
 
-# Solo permite hostnames/IPs razonables. Nada de espacios, ; | & $ ( ) ` etc.
+from apps.logs.utils import registrar_log
+
 TARGET_RE = re.compile(
     r"^(?=.{1,253}$)"
     r"(([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)$"
 )
 
 NMAP_ARGS = {
-    "nmap_fast": ["-F", "-T4"],          # puertos comunes
-    "nmap_full": ["-p-", "-T4"],         # todos los puertos
+    "nmap_fast": ["-F", "-T4"],
+    "nmap_full": ["-p-", "-T4"],
 }
 
 
@@ -26,50 +27,96 @@ def validar_target(target: str) -> str:
     return target
 
 
-def ejecutar_nmap(target: str, tipo: str, timeout: int = 600) -> str:
-    if shutil.which("nmap") is None:
-        raise RuntimeError("nmap no está instalado en el servidor.")
-
-    args = NMAP_ARGS.get(tipo, NMAP_ARGS["nmap_fast"])
-    cmd = ["nmap", *args, target]
-
-    proc = subprocess.run(
-        cmd,
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-    )
-
-    if proc.returncode != 0:
-        raise RuntimeError(proc.stderr.strip() or f"nmap terminó con código {proc.returncode}")
-
-    return proc.stdout
-
-
 def lanzar_escaneo_async(scan_job_id):
-    """Corre el escaneo en un hilo aparte y actualiza el ScanJob al terminar."""
-    from .models import ScanJob  # import local para evitar problemas de import circular
+    from .models import ScanJob
 
     def _run():
+        job = ScanJob.objects.get(id=scan_job_id)
+        job.estado = ScanJob.Estado.RUNNING
+        job.save(update_fields=["estado", "actualizado"])
+
+        registrar_log(
+            f"Escaneo iniciado: {job.target} ({job.get_tipo_display()})",
+            nivel="info",
+            origen="scan_network",
+            usuario=job.creado_por,
+        )
+
+        if shutil.which("nmap") is None:
+            job.estado = ScanJob.Estado.ERROR
+            job.error_msg = "nmap no está instalado en el servidor."
+            job.save(update_fields=["estado", "error_msg", "actualizado"])
+            return
+
+        args = NMAP_ARGS.get(job.tipo, NMAP_ARGS["nmap_fast"])
+        cmd = ["nmap", *args, job.target]
+
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        # Guarda el PID para poder cancelarlo después
+        job.pid = proc.pid
+        job.save(update_fields=["pid"])
+
         try:
-            job = ScanJob.objects.get(id=scan_job_id)
-            job.estado = ScanJob.Estado.RUNNING
-            job.save(update_fields=["estado", "actualizado"])
+            stdout, stderr = proc.communicate(timeout=600)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            stdout, stderr = proc.communicate()
 
-            salida = ejecutar_nmap(job.target, job.tipo)
+        # Refresca el job por si fue cancelado mientras corría
+        job.refresh_from_db()
+        if job.estado == ScanJob.Estado.CANCELLED:
+            registrar_log(
+                f"Escaneo cancelado: {job.target}",
+                nivel="warning",
+                origen="scan_network",
+                usuario=job.creado_por,
+            )
+            return
 
-            job.resultado = salida
-            job.estado = ScanJob.Estado.DONE
-            job.save(update_fields=["resultado", "estado", "actualizado"])
+        if proc.returncode != 0:
+            job.estado = ScanJob.Estado.ERROR
+            job.error_msg = stderr.strip() or f"nmap terminó con código {proc.returncode}"
+            job.save(update_fields=["estado", "error_msg", "actualizado"])
+            registrar_log(
+                f"Error en escaneo: {job.target}",
+                nivel="error",
+                origen="scan_network",
+                detalle=job.error_msg,
+                usuario=job.creado_por,
+            )
+            return
 
-        except Exception as e:
-            try:
-                job = ScanJob.objects.get(id=scan_job_id)
-                job.estado = ScanJob.Estado.ERROR
-                job.error_msg = str(e)
-                job.save(update_fields=["estado", "error_msg", "actualizado"])
-            except ScanJob.DoesNotExist:
-                pass
+        job.resultado = stdout
+        job.estado = ScanJob.Estado.DONE
+        job.save(update_fields=["resultado", "estado", "actualizado"])
+
+        registrar_log(
+            f"Escaneo completado: {job.target}",
+            nivel="info",
+            origen="scan_network",
+            usuario=job.creado_por,
+        )
 
     thread = threading.Thread(target=_run, daemon=True)
     thread.start()
+
+
+def cancelar_escaneo(job):
+    """Intenta matar el proceso de nmap asociado a este job."""
+    import os
+    import signal
+
+    if job.pid:
+        try:
+            os.kill(job.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass  # el proceso ya terminó por su cuenta
+
+    job.estado = job.Estado.CANCELLED
+    job.save(update_fields=["estado", "actualizado"])

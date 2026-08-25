@@ -98,7 +98,7 @@
           <!-- ===== Opciones adicionales ===== -->
           <div class="flex flex-col sm:flex-row gap-3">
             <div class="flex-1">
-              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Resolver / verificar (-nV / -resolvers)</label>
+              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Resolver / verificar</label>
               <select name="resolve" class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
                 <option value="resolve">Resolver IPs (mostrar solo activos)</option>
                 <option value="no_resolve">No resolver (más rápido)</option>
@@ -131,6 +131,9 @@
         </a>
         <a href="?estado=error" class="px-3.5 py-1.5 rounded-full border {% if estado_filtro == 'error' %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200">
           Errores
+        </a>
+        <a href="?estado=cancelled" class="px-3.5 py-1.5 rounded-full border {% if estado_filtro == 'cancelled' %}border-accent text-accent bg-accent/10{% else %}border-hairline text-mist hover:border-white/10 hover:text-paper{% endif %} transition-colors duration-200">
+          Cancelados
         </a>
       </div>
 
@@ -180,6 +183,8 @@
                   <span class="rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#22C55E] whitespace-nowrap">Completado</span>
                   {% elif scan.estado == 'running' or scan.estado == 'pending' %}
                   <span class="rounded-full border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#F59E0B] whitespace-nowrap">En progreso</span>
+                  {% elif scan.estado == 'cancelled' %}
+                  <span class="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-mono font-medium text-mist whitespace-nowrap">Cancelado</span>
                   {% else %}
                   <span class="rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#EF4444] whitespace-nowrap">Error</span>
                   {% endif %}
@@ -197,8 +202,25 @@
 
                 <div class="flex items-center gap-2">
                   {% if scan.estado == 'done' %}
-                  <button class="text-xs font-medium text-mist hover:text-paper transition-colors duration-200">
+                  <button
+                    type="button"
+                    onclick="abrirModalSubdominios(this)"
+                    data-target="{{ scan.target }}"
+                    data-fuentes="{{ scan.get_fuentes_display }}"
+                    data-resolve="{{ scan.get_resolve_display }}"
+                    data-total="{{ scan.total_subdominios }}"
+                    data-creado="{{ scan.creado|date:'d M Y, H:i' }}"
+                    data-creado-por="{{ scan.creado_por.username|default:'—' }}"
+                    data-resultado="{{ scan.resultado }}"
+                    class="text-xs font-medium text-mist hover:text-paper transition-colors duration-200">
                     Ver subdominios
+                  </button>
+                  {% elif scan.estado == 'running' or scan.estado == 'pending' %}
+                  <button
+                    type="button"
+                    onclick="cancelarDnsScan('{{ scan.id }}', this)"
+                    class="text-xs font-medium text-[#EF4444] hover:text-[#EF4444]/80 transition-colors duration-200">
+                    Cancelar
                   </button>
                   {% endif %}
                 </div>
@@ -225,10 +247,10 @@
         <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
         <div class="flex items-center gap-2">
           {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Anterior</a>
+          <a href="?estado={{ estado_filtro }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Anterior</a>
           {% endif %}
           {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Siguiente</a>
+          <a href="?estado={{ estado_filtro }}&page={{ page_obj.next_page_number }}" class="px-3 py-1.5 rounded-lg border border-hairline hover:border-white/10 hover:text-paper transition-colors duration-200">Siguiente</a>
           {% endif %}
         </div>
       </div>
@@ -238,4 +260,166 @@
       <div class="h-6"></div>
     </main>
   </div>
+
+  <!-- ============ MODAL SUBDOMINIOS ============ -->
+  <div id="modalSubdominios" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="cerrarModalSubdominios()"></div>
+
+    <div class="relative min-h-full flex items-center justify-center p-4">
+      <div class="bg-surface2 border border-hairline rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+
+        <div class="flex items-center justify-between px-6 py-4 border-b border-hairline shrink-0">
+          <div>
+            <h3 class="text-sm font-semibold text-paper" id="modalSubTarget">—</h3>
+            <p class="text-xs text-mist mt-0.5">Subdominios encontrados</p>
+          </div>
+          <button onclick="cerrarModalSubdominios()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/[0.06] text-mist hover:text-paper transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 px-6 py-4 border-b border-hairline shrink-0 text-xs font-mono">
+          <div>
+            <p class="text-mist mb-1">Fuentes</p>
+            <p class="text-paper" id="modalSubFuentes">—</p>
+          </div>
+          <div>
+            <p class="text-mist mb-1">Resolver</p>
+            <p class="text-paper" id="modalSubResolve">—</p>
+          </div>
+          <div>
+            <p class="text-mist mb-1">Total</p>
+            <p class="text-paper" id="modalSubTotal">—</p>
+          </div>
+          <div>
+            <p class="text-mist mb-1">Fecha</p>
+            <p class="text-paper" id="modalSubFecha">—</p>
+          </div>
+        </div>
+
+        <div class="px-6 py-3 border-b border-hairline shrink-0">
+          <input
+            type="text"
+            id="modalSubBuscador"
+            oninput="filtrarSubdominios()"
+            placeholder="Filtrar subdominios..."
+            class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2 text-sm text-paper placeholder:text-mist/50 focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-6 py-4">
+          <ul id="modalSubLista" class="flex flex-col divide-y divide-hairline font-mono text-xs"></ul>
+          <p id="modalSubVacio" class="text-xs text-mist text-center py-6 hidden">No se encontraron coincidencias.</p>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 px-6 py-4 border-t border-hairline shrink-0">
+          <button onclick="copiarSubdominios()" class="flex items-center gap-2 bg-surface border border-hairline hover:border-white/10 rounded-lg px-3.5 py-2 text-xs font-medium text-paper hover:bg-white/[0.04] transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar todo
+          </button>
+          <button onclick="cerrarModalSubdominios()" class="bg-accent hover:bg-accentdim rounded-lg px-4 py-2 text-xs font-medium text-white transition-colors duration-200">
+            Cerrar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let subdominiosActuales = [];
+
+    function abrirModalSubdominios(btn) {
+      const d = btn.dataset;
+
+      document.getElementById('modalSubTarget').textContent = d.target;
+      document.getElementById('modalSubFuentes').textContent = d.fuentes;
+      document.getElementById('modalSubResolve').textContent = d.resolve;
+      document.getElementById('modalSubTotal').textContent = d.total;
+      document.getElementById('modalSubFecha').textContent = d.creado;
+
+      subdominiosActuales = (d.resultado || '')
+        .split('\n')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      document.getElementById('modalSubBuscador').value = '';
+      renderizarSubdominios(subdominiosActuales);
+
+      document.getElementById('modalSubdominios').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function renderizarSubdominios(lista) {
+      const ul = document.getElementById('modalSubLista');
+      const vacio = document.getElementById('modalSubVacio');
+
+      ul.innerHTML = '';
+
+      if (lista.length === 0) {
+        vacio.classList.remove('hidden');
+        return;
+      }
+      vacio.classList.add('hidden');
+
+      lista.forEach(sub => {
+        const li = document.createElement('li');
+        li.className = 'py-2 px-1 text-paper/90 hover:bg-white/[0.03] rounded transition-colors duration-150';
+        li.textContent = sub;
+        ul.appendChild(li);
+      });
+    }
+
+    function filtrarSubdominios() {
+      const filtro = document.getElementById('modalSubBuscador').value.toLowerCase().trim();
+      if (!filtro) {
+        renderizarSubdominios(subdominiosActuales);
+        return;
+      }
+      const filtrados = subdominiosActuales.filter(s => s.toLowerCase().includes(filtro));
+      renderizarSubdominios(filtrados);
+    }
+
+    function cerrarModalSubdominios() {
+      document.getElementById('modalSubdominios').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function copiarSubdominios() {
+      const texto = subdominiosActuales.join('\n');
+      navigator.clipboard.writeText(texto);
+    }
+
+    function cancelarDnsScan(scanId, btn) {
+      if (!confirm('¿Seguro que quieres cancelar este escaneo?')) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Cancelando...';
+
+      fetch(`/home/dns-subfinder/${scanId}/cancelar/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          location.reload();
+        } else {
+          alert(data.error || 'No se pudo cancelar el escaneo.');
+          btn.disabled = false;
+          btn.textContent = 'Cancelar';
+        }
+      })
+      .catch(() => {
+        alert('Error de red al cancelar.');
+        btn.disabled = false;
+        btn.textContent = 'Cancelar';
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') cerrarModalSubdominios();
+    });
+  </script>
 {% endblock %}

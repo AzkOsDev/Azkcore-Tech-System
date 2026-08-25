@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class DnsSubfinderConfig(AppConfig):
-    name = 'dns_subfinder'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.home_fuctions.dns_subfinder"

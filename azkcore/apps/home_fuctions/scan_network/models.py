@@ -23,6 +23,7 @@ class ScanJob(models.Model):
     creado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     creado = models.DateTimeField(auto_now_add=True)
     actualizado = models.DateTimeField(auto_now=True)
+    pid = models.IntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ["-creado"]

@@ -1,10 +1,23 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from .models import ScanJob
 from .scanner import InvalidTargetError, lanzar_escaneo_async, validar_target
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .scanner import cancelar_escaneo
 
+@login_required
+@require_POST
+def cancelar_scan_view(request, pk):
+    job = get_object_or_404(ScanJob, id=pk)
+
+    if job.estado not in [ScanJob.Estado.RUNNING, ScanJob.Estado.PENDING]:
+        return JsonResponse({"ok": False, "error": "Este escaneo ya no está en progreso."}, status=400)
+
+    cancelar_escaneo(job)
+    return JsonResponse({"ok": True})
 
 @login_required
 def scan_network_view(request):
@@ -43,7 +56,7 @@ def scan_network_view(request):
         else:
             scans_qs = scans_qs.filter(estado=estado_filtro)
 
-    paginator = Paginator(scans_qs, 3)
+    paginator = Paginator(scans_qs, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 

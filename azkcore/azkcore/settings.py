@@ -30,7 +30,9 @@ INSTALLED_APPS = [
     'apps.home',
     'apps.home_fuctions.messages',
     'apps.home_fuctions.scan_web',
-    'apps.home_fuctions.scan_network'
+    'apps.home_fuctions.scan_network',
+    "apps.logs",
+    'apps.home_fuctions.dns_subfinder',
 ]
 UNFOLD = {
     "SITE_TITLE": "AzkCore Tech | Administrator",
