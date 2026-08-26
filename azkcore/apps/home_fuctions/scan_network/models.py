@@ -27,6 +27,8 @@ class ScanJob(models.Model):
 
     class Meta:
         ordering = ["-creado"]
+        verbose_name = "Network Scan"
+        verbose_name_plural = "Networks Scans"
 
     def __str__(self):
         return f"{self.target} ({self.estado})"

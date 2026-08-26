@@ -76,7 +76,7 @@
           <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
             <div class="flex-1">
               <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Target (URL)</label>
-              <input type="text" name="target" placeholder="https://ejemplo.com" required
+              <input type="text" name="target" placeholder="https://example.com" required
                 class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper placeholder:text-mist/50 focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
             </div>
 
@@ -262,17 +262,52 @@
                 <span class="text-[11px] text-mist/70 font-mono">{{ scan.creado|date:"d M Y, H:i" }}</span>
 
                 <div class="flex items-center gap-2">
-                  {% if scan.estado == 'done' %}
-                  <button class="text-xs font-medium text-mist hover:text-paper transition-colors duration-200">
-                    Ver detalle
-                  </button>
+                  {% if scan.estado == 'done' or scan.estado == 'error' %}
+                    <button type="button" class="ver-detalle-btn text-xs font-medium text-mist hover:text-paper transition-colors duration-200" data-scan-id="{{ scan.id }}">
+                      Ver detalle
+                    </button>
                   {% endif %}
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <template id="detalle-tpl-{{ scan.id }}">
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+              <div>
+                <span class="text-mist block mb-1 uppercase tracking-wider">Target</span>
+                <span class="text-paper break-all">{{ scan.target }}</span>
+              </div>
+              <div>
+                <span class="text-mist block mb-1 uppercase tracking-wider">Herramienta</span>
+                <span class="text-paper uppercase">{{ scan.herramienta }}</span>
+              </div>
+              <div>
+                <span class="text-mist block mb-1 uppercase tracking-wider">Estado</span>
+                <span class="text-paper">{{ scan.get_estado_display }}</span>
+              </div>
+              <div>
+                <span class="text-mist block mb-1 uppercase tracking-wider">Fecha</span>
+                <span class="text-paper">{{ scan.creado|date:"d M Y, H:i" }}</span>
+              </div>
+            </div>
 
+            {% if scan.opciones %}
+            <div>
+              <span class="text-mist block mb-1.5 text-xs uppercase tracking-wider font-mono">Opciones</span>
+              <pre class="bg-surface border border-hairline rounded-lg p-3 text-xs text-mist font-mono overflow-x-auto">{{ scan.opciones|pprint }}</pre>
+            </div>
+            {% endif %}
+
+            <div>
+              <span class="text-mist block mb-1.5 text-xs uppercase tracking-wider font-mono">
+                {% if scan.estado == 'error' %}Error{% else %}Resultado{% endif %}
+              </span>
+              <pre class="bg-surface border border-hairline rounded-lg p-3 text-xs {% if scan.estado == 'error' %}text-[#EF4444]{% else %}text-paper{% endif %} font-mono overflow-x-auto whitespace-pre-wrap max-h-[50vh] overflow-y-auto">{{ scan.resultado|default:scan.error_msg|default:"Sin datos." }}</pre>
+            </div>
+          </div>
+        </template>
         {% empty %}
         <!-- Empty state -->
         <div class="bg-surface2 border border-hairline rounded-2xl p-12 flex flex-col items-center justify-center text-center">
@@ -299,7 +334,19 @@
         </div>
       </div>
       {% endif %}
+      <div id="detalle-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div id="detalle-modal-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
+        <div class="relative bg-surface2 border border-hairline rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-hairline">
+            <h3 class="text-sm font-semibold text-paper">Detalle del escaneo</h3>
+            <button type="button" id="detalle-modal-close" class="text-mist hover:text-paper transition-colors duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div id="detalle-modal-body" class="p-5 overflow-y-auto"></div>
+        </div>
+      </div>
       <!-- Footer spacing -->
       <div class="h-6"></div>
     </main>
@@ -322,6 +369,40 @@
 
       select.addEventListener('change', syncOpts);
       syncOpts();
+    })();
+    
+    (function () {
+      var modal = document.getElementById('detalle-modal');
+      var backdrop = document.getElementById('detalle-modal-backdrop');
+      var closeBtn = document.getElementById('detalle-modal-close');
+      var body = document.getElementById('detalle-modal-body');
+      if (!modal) return;
+
+      function abrirModal(scanId) {
+        var tpl = document.getElementById('detalle-tpl-' + scanId);
+        if (!tpl) return;
+        body.innerHTML = '';
+        body.appendChild(tpl.content.cloneNode(true));
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      }
+
+      function cerrarModal() {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+
+      document.querySelectorAll('.ver-detalle-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          abrirModal(btn.dataset.scanId);
+        });
+      });
+
+      backdrop.addEventListener('click', cerrarModal);
+      closeBtn.addEventListener('click', cerrarModal);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') cerrarModal();
+      });
     })();
   </script>
 {% endblock %}

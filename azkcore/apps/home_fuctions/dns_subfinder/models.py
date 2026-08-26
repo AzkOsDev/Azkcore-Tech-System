@@ -44,6 +44,8 @@ class DnsScanJob(models.Model):
 
     class Meta:
         ordering = ["-creado"]
+        verbose_name = "Subfinder DNS"
+        verbose_name_plural = "Subfinder DNS"
 
     def __str__(self):
         return f"{self.target} ({self.estado})"

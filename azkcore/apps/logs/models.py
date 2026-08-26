@@ -29,6 +29,8 @@ class LogEntry(models.Model):
             models.Index(fields=["-creado"]),
             models.Index(fields=["nivel"]),
         ]
+        verbose_name = "Log"
+        verbose_name_plural = "Logs"
 
     def __str__(self):
         return f"[{self.nivel}] {self.mensaje}"

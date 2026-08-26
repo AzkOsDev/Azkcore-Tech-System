@@ -16,14 +16,14 @@
 
           <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-br from-deepblue to-accent flex items-center justify-center text-xl font-display font-semibold text-white">
             {% if user.profile_picture %}
-            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="w-16 h-16 rounded-full object-cover">
+            <img src="{{ user.profile_picture.url }}" alt="{{ user.username }} " class="w-16 h-16 rounded-full object-cover">
             {% else %}
             {{ user.username|slice:":2"|upper }}
             {% endif %}
           </div>
 
           <div class="flex-1 min-w-0">
-            <h2 class="text-lg font-display font-semibold tracking-tight text-paper">{{ user.get_full_name|default:user.username }}</h2>
+            <h2 class="text-lg font-display font-semibold tracking-tight text-paper">{{ user.get_full_name|default:user.username }} </h2>
             <p class="text-sm text-mist mt-0.5">{{ user.email }}</p>
             <div class="flex items-center gap-2 mt-2">
               <span class="rounded-full border border-accent/20 bg-accent/10 px-2.5 py-1 text-[10px] font-mono font-medium text-accent uppercase tracking-wider">

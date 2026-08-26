@@ -1,6 +1,8 @@
 from pathlib import Path
 from django.templatetags.static import static
 from decouple import config
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 API_BEARER_TOKEN = config("API_BEARER_TOKEN", default=None)
 API_BASE_URL = config("API_BASE_URL", default="http://127.0.0.1:8000")
@@ -34,24 +36,158 @@ INSTALLED_APPS = [
     "apps.logs",
     'apps.home_fuctions.dns_subfinder',
 ]
+
 UNFOLD = {
     "SITE_TITLE": "AzkCore Tech | Administrator",
-    "SITE_HEADER": "AzkCore Administrator",
+    "SITE_HEADER": "AzkCore Security Panel",
+    "SITE_SUBHEADER": "Monitoreo y análisis de infraestructura",
     "SITE_URL": "/",
-    "SITE_SYMBOL": "security",
+    "SITE_SYMBOL": "shield_with_heart",  # ícono fallback si no hay logo
 
-    "SHOW_HISTORY": True,
-    "SHOW_VIEW_ON_SITE": True,
-    "THEME": "dark",
-
+    "SITE_ICON": {
+        "light": lambda request: static("img/favicon.png"),
+        "dark": lambda request: static("img/favicon.png"),
+    },
     "SITE_LOGO": {
         "light": lambda request: static("img/logo_blue.png"),
         "dark": lambda request: static("img/logo_black.png"),
     },
 
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "SHOW_BACK_BUTTON": True,
+
+    # ------------------------------------------------------------
+    # Buscador con comandos (Cmd+K) — mejora mucho la experiencia
+    # ------------------------------------------------------------
+    "COMMAND": {
+        "search_models": True,
+        "show_history": True,
+    },
+
+    # ------------------------------------------------------------
+    # PALETA — Tema "cyber" cyan/azul oscuro, look tipo SOC
+    # ------------------------------------------------------------
+    "COLORS": {
+        "base": {
+            "50": "248 250 252",
+            "100": "241 245 249",
+            "200": "226 232 240",
+            "300": "203 213 225",
+            "400": "148 163 184",
+            "500": "100 116 139",
+            "600": "71 85 105",
+            "700": "51 65 85",
+            "800": "30 41 59",
+            "900": "15 23 42",
+            "950": "2 6 23",
+        },
+        "primary": {
+            "50": "236 254 255",
+            "100": "207 250 254",
+            "200": "165 243 252",
+            "300": "103 232 249",
+            "400": "34 211 238",
+            "500": "6 182 212",
+            "600": "8 145 178",
+            "700": "14 116 144",
+            "800": "21 94 117",
+            "900": "22 78 99",
+            "950": "8 51 68",
+        },
+        "font": {
+            "subtle-light": "100 116 139",
+            "subtle-dark": "148 163 184",
+            "default-light": "30 41 59",
+            "default-dark": "226 232 240",
+            "important-light": "15 23 42",
+            "important-dark": "248 250 252",
+        },
+    },
+
+    "BORDER_RADIUS": "8px",
+
+    # ------------------------------------------------------------
+    # Badge de entorno (dev/staging/prod)
+    # ------------------------------------------------------------
+    "ENVIRONMENT": "apps.home.admin_utils.environment_callback",
+
+
+    # ------------------------------------------------------------
+    # Dashboard personalizado con KPIs
+    # ------------------------------------------------------------
+    "DASHBOARD_CALLBACK": "apps.home.admin_utils.dashboard_callback",
+
+    "LOGIN": {
+        "image": lambda request: static("img/login-bg.jpg"),
+    },
+
+    # ------------------------------------------------------------
+    # SIDEBAR — organizado por función, no por app técnica
+    # ------------------------------------------------------------
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": True,
+        "navigation": [
+            {
+                "title": _("Panel principal"),
+                "separator": True,
+                "collapsible": False,
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "space_dashboard",
+                        "link": reverse_lazy("admin:index"),
+                    },
+                ],
+            },
+            {
+                "title": _("Reconocimiento DNS"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Subfinder"),
+                        "icon": "dns",
+                        "link": reverse_lazy("admin:dns_subfinder_dnsscanjob_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Escaneo y Monitoreo"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Network Scan"),
+                        "icon": "radar",
+                        "link": reverse_lazy("admin:scan_network_scanjob_changelist"),
+                    },
+                    {
+                        "title": _("Logs del sistema"),
+                        "icon": "receipt_long",
+                        "link": reverse_lazy("admin:logs_logentry_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Usuarios y permisos"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Usuarios"),
+                        "icon": "person",
+                        "link": reverse_lazy("admin:auth_user_changelist"),
+                    },
+                    {
+                        "title": _("Grupos"),
+                        "icon": "group",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                    },
+                ],
+            },
+        ],
     },
 }
 MIDDLEWARE = [
