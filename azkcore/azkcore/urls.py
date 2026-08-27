@@ -15,6 +15,8 @@ urlpatterns = [
     path("auth/logout/", logout, name="logout"),
     path("home/dashboard/", dashboard_view, name="dashboard"),
     path("home/messages/", include('apps.home_fuctions.messages.urls')),
+    path("home/file-scanner/", include('apps.home_fuctions.file_scanner.urls')),
+    path("home/password-analyzer/", include('apps.home_fuctions.password_analyzer.urls')),
     path("home/scan-network/", scan_network_view, name="scan_network"),
     path("home/scan-web/", scan_web_view, name="scan_web"),
     path("home/scan-web/<int:job_id>/cancelar/", cancelar_escaneo_view, name="cancelar_scan_web"),
@@ -24,3 +26,4 @@ urlpatterns = [
     path("home/logs/", logs_view, name="logs"),
     path("home/dns-subfinder/<uuid:pk>/cancelar/", cancelar_dns_scan_view, name="cancelar_dns_scan")
 ]
+

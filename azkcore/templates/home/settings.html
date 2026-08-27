@@ -36,7 +36,7 @@
             </div>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-3 mb-3">
+          <div class="flex flex-col sm:flex-row gap-3">
             <div class="flex-1">
               <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Usuario</label>
               <input type="text" name="username" value="{{ user.username }}"
@@ -52,25 +52,34 @@
 
         <!-- ============ SEGURIDAD ============ -->
         <div class="bg-surface2 border border-hairline rounded-2xl p-5">
-          <h3 class="text-sm font-semibold text-paper mb-4">Seguridad</h3>
+          <h3 class="text-sm font-semibold text-paper mb-1">Seguridad</h3>
+          <p class="text-xs text-mist mb-4">Deja estos campos vacíos si no quieres cambiar tu contraseña.</p>
 
-          <div class="flex flex-col sm:flex-row gap-3">
-            <div class="flex-1">
+          <div class="flex flex-col gap-3">
+            <div>
               <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Contraseña actual</label>
-              <input type="password" name="current_password" placeholder="••••••••"
+              <input type="password" name="current_password" placeholder="••••••••" autocomplete="current-password"
                 class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper placeholder:text-mist/50 focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
             </div>
-            <div class="flex-1">
-              <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Nueva contraseña</label>
-              <input type="password" name="new_password" placeholder="••••••••"
-                class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper placeholder:text-mist/50 focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <div class="flex-1">
+                <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Nueva contraseña</label>
+                <input type="password" name="new_password" placeholder="••••••••" autocomplete="new-password"
+                  class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper placeholder:text-mist/50 focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+              </div>
+              <div class="flex-1">
+                <label class="block text-xs text-mist mb-1.5 font-mono uppercase tracking-wider">Confirmar contraseña</label>
+                <input type="password" name="confirm_password" placeholder="••••••••" autocomplete="new-password"
+                  class="w-full bg-surface border border-hairline rounded-lg px-3.5 py-2.5 text-sm text-paper placeholder:text-mist/50 focus:outline-none focus:ring-1 focus:ring-accent/60 transition-colors duration-200">
+              </div>
             </div>
           </div>
         </div>
 
         <!-- ============ ACCIONES ============ -->
         <div class="flex items-center justify-end gap-3">
-          <button type="button" class="px-4 py-2.5 rounded-lg border border-hairline text-sm font-medium text-mist hover:text-paper hover:border-white/10 transition-colors duration-200">
+          <button type="button" onclick="window.location.reload()" class="px-4 py-2.5 rounded-lg border border-hairline text-sm font-medium text-mist hover:text-paper hover:border-white/10 transition-colors duration-200">
             Cancelar
           </button>
           <button type="submit" class="px-5 py-2.5 rounded-lg bg-accent hover:bg-accentdim text-sm font-medium text-white transition-colors duration-200">
@@ -79,8 +88,8 @@
         </div>
 
       </form>
-        <!-- ============ TOAST NOTIFICATIONS ============ -->
 
+      <!-- ============ TOAST NOTIFICATIONS ============ -->
       {% if messages %}
         <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col-reverse gap-2">
           {% for message in messages %}
@@ -93,14 +102,12 @@
               style="animation: toast-in 0.25s ease-out;">
 
               {% if message.tags == 'error' %}
-                <!-- X icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="15" y1="9" x2="9" y2="15"></line>
                   <line x1="9" y1="9" x2="15" y2="15"></line>
                 </svg>
               {% else %}
-                <!-- Check icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
                   <path d="M8 12.5l2.5 2.5L16 9.5"></path>
@@ -132,7 +139,6 @@
           });
         </script>
       {% endif %}
-
 
       <!-- Footer spacing -->
       <div class="h-6"></div>

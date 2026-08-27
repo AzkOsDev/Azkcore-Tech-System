@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     'apps.home_fuctions.scan_network',
     "apps.logs",
     'apps.home_fuctions.dns_subfinder',
+    'apps.home_fuctions.file_scanner',
+    'apps.home_fuctions.password_analyzer'
 ]
 
 UNFOLD = {

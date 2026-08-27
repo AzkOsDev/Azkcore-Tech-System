@@ -1,0 +1,129 @@
+{% extends "components/home/base.html" %}
+{% load static %}
+{% block title %}Azkcore - File Scanner{% endblock %}
+{% block content %}
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    {% include "components/home/header.html" with subtitle="File Scanner" description="Analiza archivos en busca de indicadores de riesgo" %}
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+
+      <!-- Page heading -->
+      <div class="mb-6">
+        <h2 class="text-xl font-display font-semibold tracking-tight">File Scanner</h2>
+        <p class="text-sm text-mist mt-1">Sube un archivo para calcular sus hashes y detectar indicadores de riesgo</p>
+      </div>
+
+      <!-- ============ FORM DE SUBIDA ============ -->
+      <div class="bg-surface2 border border-hairline rounded-2xl p-5 mb-6">
+        <h3 class="text-sm font-semibold text-paper mb-4">Nuevo análisis</h3>
+
+        <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-4">
+          {% csrf_token %}
+
+          <label for="archivo-input"
+            class="flex flex-col items-center justify-center gap-2 border border-dashed border-hairline hover:border-accent/50 rounded-xl px-6 py-10 cursor-pointer transition-colors duration-200 bg-surface"
+            id="dropzone">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-mist">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
+              <path d="M14 2v6h6"/>
+              <path d="M12 12v6M9 15l3-3 3 3"/>
+            </svg>
+            <p class="text-sm text-paper" id="dropzone-text">Arrastra un archivo aquí o haz clic para seleccionarlo</p>
+            <p class="text-xs text-mist">Tamaño máximo: {{ max_file_size_mb }} MB</p>
+            <input id="archivo-input" type="file" name="archivo" class="hidden">
+          </label>
+
+          <div class="flex justify-end">
+            <button type="submit" class="px-5 py-2.5 rounded-lg bg-accent hover:bg-accentdim text-sm font-medium text-white transition-colors duration-200">
+              Analizar archivo
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ============ HISTORIAL DE ESCANEOS ============ -->
+      <div class="bg-surface2 border border-hairline rounded-2xl p-5">
+        <h3 class="text-sm font-semibold text-paper mb-4">Historial de análisis</h3>
+
+        <div class="flex flex-col gap-3">
+          {% for scan in escaneos %}
+          <div class="border border-hairline rounded-xl p-4 {% if not forloop.last %}mb-1{% endif %}">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="text-sm text-paper font-medium truncate">{{ scan.nombre_original }}</p>
+                <p class="text-xs text-mist mt-0.5 font-mono">{{ scan.creado|date:"d M Y, H:i" }} · {{ scan.tamano_bytes|filesizeformat }}</p>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0">
+                {% if scan.veredicto == 'malicioso' %}
+                <span class="rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#EF4444] whitespace-nowrap uppercase">Malicioso</span>
+                {% elif scan.veredicto == 'sospechoso' %}
+                <span class="rounded-full border border-[#F59E0B]/20 bg-[#F59E0B]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#F59E0B] whitespace-nowrap uppercase">Sospechoso</span>
+                {% elif scan.veredicto == 'limpio' %}
+                <span class="rounded-full border border-[#22C55E]/20 bg-[#22C55E]/10 px-2.5 py-1 text-[10px] font-mono font-medium text-[#22C55E] whitespace-nowrap uppercase">Limpio</span>
+                {% else %}
+                <span class="rounded-full border border-hairline bg-surface px-2.5 py-1 text-[10px] font-mono font-medium text-mist whitespace-nowrap uppercase">{{ scan.get_estado_display }}</span>
+                {% endif %}
+
+                <form method="POST" action="{% url 'file_scan_delete' scan.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="text-mist hover:text-[#EF4444] transition-colors duration-200" title="Eliminar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {% if scan.estado == 'done' %}
+            <div class="mt-3 pt-3 border-t border-hairline grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] text-mist">SHA256</span>
+                <span class="text-[11px] text-paper font-mono truncate max-w-[220px]">{{ scan.hash_sha256|slice:":16" }}…</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] text-mist">MD5</span>
+                <span class="text-[11px] text-paper font-mono">{{ scan.hash_md5 }}</span>
+              </div>
+            </div>
+            <p class="text-xs text-mist mt-2">{{ scan.resultado }}</p>
+            {% elif scan.estado == 'error' %}
+            <p class="text-xs text-[#EF4444] mt-3 pt-3 border-t border-hairline">{{ scan.error_msg }}</p>
+            {% endif %}
+          </div>
+          {% empty %}
+          <p class="text-sm text-mist py-2">Todavía no has analizado ningún archivo.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Footer spacing -->
+      <div class="h-6"></div>
+    </main>
+  </div>
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const input = document.getElementById('archivo-input');
+    const text = document.getElementById('dropzone-text');
+
+    input.addEventListener('change', () => {
+      if (input.files.length > 0) {
+        text.textContent = input.files[0].name;
+      }
+    });
+
+    ['dragover', 'dragleave', 'drop'].forEach(evt => {
+      dropzone.addEventListener(evt, (e) => e.preventDefault());
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      if (e.dataTransfer.files.length > 0) {
+        input.files = e.dataTransfer.files;
+        text.textContent = e.dataTransfer.files[0].name;
+      }
+    });
+  </script>
+{% endblock %}

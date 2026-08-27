@@ -28,7 +28,7 @@
 
         <span class="h-6 w-px bg-hairline"></span>
 
-        <button class="flex items-center gap-2.5 pl-1 pr-2.5 py-1 rounded-lg hover:bg-white/[0.05] transition-colors duration-200">
+        <a href="{% url "profile" %}" class="flex items-center gap-2.5 pl-1 pr-2.5 py-1 rounded-lg hover:bg-white/[0.05] transition-colors duration-200">
           <div class="w-8 h-8 rounded-full bg-gradient-to-br from-deepblue to-accent flex items-center justify-center text-xs font-semibold">
             AR
           </div>
@@ -36,7 +36,7 @@
             <span class="text-xs font-medium text-paper">{{ user.first_name }} {{ user.last_name }}</span>
             <span class="text-[11px] text-mist">{{ user.username }}</span>
           </div>
-        </button>
+        </a>
         <form method="POST" action="{% url 'logout' %}">
           {% csrf_token %}
           <button type="submit" class="flex items-center gap-2 bg-[#EF4444] hover:bg-[#EF4444]/90 rounded-lg px-3.5 py-2 text-sm font-medium text-white transition-colors duration-200">
